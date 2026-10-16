@@ -21,8 +21,8 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 
-private const val PREFS_NAME = "just_x_settings"
-private const val WATCH_PREFIX = "watch_"
+internal const val PREFS_NAME = "just_x_settings"
+internal const val WATCH_PREFIX = "watch_"
 private val DEFAULT_TARGETS = setOf(
     "com.google.android.youtube",
     "com.zhiliaoapp.musically",
