@@ -160,7 +160,13 @@ class ExitAccessibilityService : AccessibilityService() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (!moved) performGlobalAction(GLOBAL_ACTION_HOME)
+                    if (!moved) {
+                        // Hide immediately when the X sends the user Home. Some launchers
+                        // are treated as transient system windows, so their events may be ignored.
+                        performGlobalAction(GLOBAL_ACTION_HOME)
+                        lastForegroundPackage = null
+                        hideFloatingButton()
+                    }
                     true
                 }
                 MotionEvent.ACTION_CANCEL -> true
