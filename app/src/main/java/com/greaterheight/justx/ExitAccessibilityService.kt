@@ -40,8 +40,12 @@ class ExitAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val appPackage = event.packageName?.toString() ?: return
-        lastForegroundPackage = appPackage
 
+        // Our own accessibility overlay can generate window events. Ignore those,
+        // otherwise the button can hide itself immediately after it appears.
+        if (appPackage == packageName || isTransientSystemPackage(appPackage)) return
+
+        lastForegroundPackage = appPackage
         if (shouldShowFor(appPackage)) {
             showFloatingButton()
         } else {
@@ -59,6 +63,21 @@ class ExitAccessibilityService : AccessibilityService() {
         }
         hideFloatingButton()
         super.onDestroy()
+    }
+
+    private fun isTransientSystemPackage(appPackage: String): Boolean {
+        // These packages can raise window events while the selected app remains
+        // foreground (system UI, keyboard, launcher transitions, and permissions).
+        return appPackage in setOf(
+            "com.android.systemui",
+            "com.google.android.inputmethod.latin",
+            "com.android.inputmethod.latin",
+            "com.google.android.permissioncontroller",
+            "com.android.permissioncontroller",
+            "com.transsion.systemui",
+            "com.transsion.hilauncher",
+            "com.transsion.launcher"
+        )
     }
 
     private fun shouldShowFor(appPackage: String): Boolean {
