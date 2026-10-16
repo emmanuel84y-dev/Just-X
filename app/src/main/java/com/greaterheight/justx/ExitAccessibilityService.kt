@@ -125,7 +125,7 @@ class ExitAccessibilityService : AccessibilityService() {
                 MotionEvent.ACTION_MOVE -> {
                     val deltaX = event.rawX - downX
                     val deltaY = event.rawY - downY
-                    if (abs(deltaX) > touchSlop || abs(deltaY) > touchSlop) moved = true
+                    if (abs(deltaX) > touchSlop.toFloat() || abs(deltaY) > touchSlop.toFloat()) moved = true
                     if (moved) {
                         val screenWidth = resources.displayMetrics.widthPixels
                         val screenHeight = resources.displayMetrics.heightPixels
