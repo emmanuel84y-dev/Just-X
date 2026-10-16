@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Just X</string>
+    <string name="accessibility_service_name">Just X floating exit button</string>
+    <string name="accessibility_service_description">Shows a small exit button only while an app selected in Just X is open. The button returns you to the home screen.</string>
+</resources>
