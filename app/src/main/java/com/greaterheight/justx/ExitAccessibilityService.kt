@@ -21,6 +21,7 @@ class ExitAccessibilityService : AccessibilityService() {
     private var floatingButton: View? = null
     private var floatingParams: WindowManager.LayoutParams? = null
     private var lastForegroundPackage: String? = null
+    private var packageToIgnoreAfterExit: String? = null
 
     private val preferencesListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key?.startsWith(WATCH_PREFIX) == true) {
@@ -44,6 +45,14 @@ class ExitAccessibilityService : AccessibilityService() {
         // Our own accessibility overlay can generate window events. Ignore those,
         // otherwise the button can hide itself immediately after it appears.
         if (appPackage == packageName || isTransientSystemPackage(appPackage)) return
+
+        // Ignore delayed window events from the app we just exited. Some launchers
+        // report the previous app again after HOME, which would make the X reappear.
+        val exitedPackage = packageToIgnoreAfterExit
+        if (exitedPackage != null) {
+            if (appPackage == exitedPackage) return
+            packageToIgnoreAfterExit = null
+        }
 
         lastForegroundPackage = appPackage
         if (shouldShowFor(appPackage)) {
@@ -163,9 +172,10 @@ class ExitAccessibilityService : AccessibilityService() {
                     if (!moved) {
                         // Hide immediately when the X sends the user Home. Some launchers
                         // are treated as transient system windows, so their events may be ignored.
-                        performGlobalAction(GLOBAL_ACTION_HOME)
+                        packageToIgnoreAfterExit = lastForegroundPackage
                         lastForegroundPackage = null
                         hideFloatingButton()
+                        performGlobalAction(GLOBAL_ACTION_HOME)
                     }
                     true
                 }
